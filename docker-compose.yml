@@ -1,0 +1,83 @@
+# Ambiente completo: PostgreSQL, Redis, Django/Wagtail, Next.js e Caddy (SSL automático).
+# Desenvolvimento: `docker compose up` e abrir http://forca.localhost:3100 e http://localhost:8000/admin/
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gym
+      POSTGRES_USER: gym
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gym}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gym"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+
+  backend:
+    build: ./backend
+    env_file: [{ path: .env, required: false }]
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-true}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-insecure-change-me}
+      DATABASE_URL: postgres://gym:${POSTGRES_PASSWORD:-gym}@db:5432/gym
+      REDIS_URL: redis://redis:6379/0
+      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:-}
+      PLATFORM_DOMAIN: ${PLATFORM_DOMAIN:-localhost}
+      SITE_PUBLIC_SCHEME: ${SITE_PUBLIC_SCHEME:-http}
+      SITE_PUBLIC_PORT: ${SITE_PUBLIC_PORT:-3100}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:8000}
+      WAGTAILADMIN_BASE_URL: ${API_PUBLIC_URL:-http://localhost:8000}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${API_PUBLIC_URL:-http://localhost:8000}
+      FRONTEND_INTERNAL_URL: http://site:3100
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-dev-revalidate-secret}
+    volumes: [media:/app/media]
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+
+  # Tarefa diária (cobranças do período seguinte e lembretes). Idempotente: corre de hora a hora.
+  tarefas:
+    build: ./backend
+    command: sh -c "while true; do python manage.py gestao_diaria; sleep 3600; done"
+    env_file: [{ path: .env, required: false }]
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-true}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-insecure-change-me}
+      DATABASE_URL: postgres://gym:${POSTGRES_PASSWORD:-gym}@db:5432/gym
+      REDIS_URL: redis://redis:6379/0
+      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:-}
+      SITE_PUBLIC_SCHEME: ${SITE_PUBLIC_SCHEME:-http}
+      SITE_PUBLIC_PORT: ${SITE_PUBLIC_PORT:-3100}
+    depends_on: [backend]
+
+  site:
+    build: ./site
+    environment:
+      API_URL: http://backend:8000
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-dev-revalidate-secret}
+      DEV_DEFAULT_DOMAIN: ${DEV_DEFAULT_DOMAIN:-forca.localhost}
+    ports: ["3100:3100"]
+    depends_on: [backend]
+
+  # Em produção: definir ADMIN_DOMAIN e ACME_EMAIL e expor só o Caddy (80/443).
+  caddy:
+    image: caddy:2-alpine
+    profiles: [producao]
+    environment:
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN:-admin.localhost}
+      ACME_EMAIL: ${ACME_EMAIL:-ops@example.com}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - media:/srv/media:ro
+    depends_on: [backend, site]
+
+volumes:
+  pgdata:
+  media:
+  caddy_data:

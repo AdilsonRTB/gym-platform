@@ -1,0 +1,23 @@
+{% if ginasio %}
+<section class="plataforma-painel">
+  <div class="plataforma-painel__topo">
+    <div>
+      <p class="plataforma-muted">A gerir</p>
+      <h2>{{ ginasio.nome }}</h2>
+      <p class="plataforma-muted">{{ estado }}</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_site }}" target="_blank" rel="noopener">Ver site ↗</a>
+  </div>
+  <div class="plataforma-kpis">
+    <a class="plataforma-kpi" href="{% url 'leads_lead:index' %}?estado=novo">
+      <span class="plataforma-kpi__valor">{{ leads_novos }}</span><span>Leads por tratar</span>
+    </a>
+    <a class="plataforma-kpi" href="{% url 'billing_adesao:index' %}">
+      <span class="plataforma-kpi__valor">{{ adesoes_30d }}</span><span>Adesões pagas (30 dias)</span>
+    </a>
+    <a class="plataforma-kpi" href="{% url 'wagtailsnippets_content_aula:list' %}">
+      <span class="plataforma-kpi__valor">{{ aulas_hoje }}</span><span>Aulas hoje</span>
+    </a>
+  </div>
+</section>
+{% endif %}

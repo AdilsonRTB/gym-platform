@@ -1,0 +1,46 @@
+{% extends "wagtailadmin/base.html" %}
+{% block titletag %}Equipa{% endblock %}
+{% block content %}
+  {% include "wagtailadmin/shared/header.html" with title="Equipa" subtitle=ginasio.nome icon="group" %}
+  <div class="nice-padding">
+    <ul class="plataforma-lista">
+      {% for m in membros %}
+        <li class="plataforma-item">
+          <div>
+            <strong>{{ m.user.get_full_name|default:m.user.email }}</strong>
+            <span class="plataforma-muted">{{ m.user.email }}</span>
+          </div>
+          <div class="plataforma-acoes">
+            <span class="plataforma-tag">{{ m.get_papel_display }}</span>
+            {% if m.user != request.user %}
+              <form method="post" action="{% url 'tenants_remover_membro' m.pk %}">{% csrf_token %}
+                <button class="button button-small button-secondary no">Remover</button>
+              </form>
+            {% endif %}
+          </div>
+        </li>
+      {% empty %}
+        <li class="plataforma-item">Ainda não há ninguém na equipa.</li>
+      {% endfor %}
+    </ul>
+
+    <h2 class="plataforma-subtitulo">Adicionar à equipa</h2>
+    <form method="post" class="plataforma-form">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="plataforma-campo">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}<p class="error-message">{{ error }}</p>{% endfor %}
+        </div>
+      {% endfor %}
+      <button class="button">Adicionar</button>
+    </form>
+    <dl class="plataforma-papeis">
+      <dt>Dono</dt><dd>Tudo, incluindo marca, pagamentos, faturação e equipa.</dd>
+      <dt>Gestor</dt><dd>Conteúdo, horário, planos e leads; sem configurações fiscais.</dd>
+      <dt>Rececionista</dt><dd>Leads, horário e registo de pagamentos presenciais.</dd>
+      <dt>Treinador</dt><dd>Apenas o seu perfil e as suas aulas.</dd>
+    </dl>
+  </div>
+{% endblock %}

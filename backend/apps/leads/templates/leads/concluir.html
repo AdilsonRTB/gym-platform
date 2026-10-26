@@ -1,0 +1,23 @@
+{% extends "wagtailadmin/base.html" %}
+{% block titletag %}Pedido de dados{% endblock %}
+{% block content %}
+  {% include "wagtailadmin/shared/header.html" with title=pedido.get_tipo_display subtitle=pedido.email icon="lock" %}
+  <div class="nice-padding">
+    <div class="plataforma-painel">
+      {% if pedido.tipo == "exportacao" %}
+        <p>Vai ser gerado um ficheiro JSON com todos os dados de <strong>{{ pedido.email }}</strong>
+          neste ginásio (leads, adesões e pagamentos), para enviar ao titular.</p>
+      {% else %}
+        <p>Os dados pessoais de <strong>{{ pedido.email }}</strong> vão ser <strong>anonimizados</strong>
+          em leads e adesões. Esta ação não pode ser desfeita.</p>
+        <p class="plataforma-muted">As faturas emitidas mantêm-se, por obrigação legal de conservação fiscal.</p>
+      {% endif %}
+      <form method="post">{% csrf_token %}
+        <button class="button {% if pedido.tipo == 'eliminacao' %}no{% endif %}">
+          {% if pedido.tipo == "exportacao" %}Exportar e concluir{% else %}Eliminar e concluir{% endif %}
+        </button>
+        <a class="button button-secondary" href="{% url 'leads_pedidodados:index' %}">Cancelar</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,22 @@
+/* Pequenos ajustes ao Admin do Wagtail para as vistas da plataforma. */
+.plataforma-lista { list-style: none; margin: 0 0 2rem; padding: 0; border: 1px solid var(--w-color-border-furniture); border-radius: .75rem; overflow: hidden; }
+.plataforma-item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--w-color-border-furniture); }
+.plataforma-item:last-child { border-bottom: 0; }
+.plataforma-item--atual { background: var(--w-color-surface-menu-item-active, rgba(0,0,0,.03)); }
+.plataforma-item strong { display: block; }
+.plataforma-muted { color: var(--w-color-text-meta); font-size: .875rem; margin: 0; }
+.plataforma-tag { display: inline-block; font-size: .75rem; font-weight: 600; padding: .25rem .6rem; border-radius: 999px; background: var(--w-color-surface-field-inactive, #eee); }
+.plataforma-acoes { display: flex; align-items: center; gap: .75rem; }
+.plataforma-subtitulo { margin: 2rem 0 1rem; }
+.plataforma-form { display: grid; gap: 1rem; max-width: 32rem; }
+.plataforma-campo label { display: block; font-weight: 600; margin-bottom: .35rem; }
+.plataforma-papeis { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1.5rem; margin-top: 2.5rem; color: var(--w-color-text-meta); }
+.plataforma-papeis dt { font-weight: 600; color: var(--w-color-text-context); }
+.plataforma-papeis dd { margin: 0; }
+.plataforma-painel { border: 1px solid var(--w-color-border-furniture); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; }
+.plataforma-painel__topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
+.plataforma-painel h2 { margin: .25rem 0; font-size: 1.5rem; }
+.plataforma-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; }
+.plataforma-kpi { display: flex; flex-direction: column; gap: .25rem; padding: 1rem 1.25rem; border-radius: .75rem; background: var(--w-color-surface-field-inactive, #f6f6f6); color: inherit; text-decoration: none; }
+.plataforma-kpi:hover { outline: 2px solid var(--w-color-border-field-hover, #ccc); }
+.plataforma-kpi__valor { font-size: 2rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }

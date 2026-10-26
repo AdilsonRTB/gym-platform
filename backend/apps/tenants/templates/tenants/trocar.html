@@ -1,0 +1,28 @@
+{% extends "wagtailadmin/base.html" %}
+{% block titletag %}Ginásio{% endblock %}
+{% block content %}
+  {% include "wagtailadmin/shared/header.html" with title="Ginásio" subtitle="Escolha o ginásio que quer gerir" icon="home" %}
+  <div class="nice-padding">
+    {% if ginasios %}
+      <ul class="plataforma-lista">
+        {% for g in ginasios %}
+          <li class="plataforma-item {% if atual and atual.pk == g.pk %}plataforma-item--atual{% endif %}">
+            <div>
+              <strong>{{ g.nome }}</strong>
+              <span class="plataforma-muted">{{ g.dominio_principal|default:"sem domínio" }} · {{ g.get_estado_display }}</span>
+            </div>
+            {% if atual and atual.pk == g.pk %}
+              <span class="plataforma-tag">Atual</span>
+            {% else %}
+              <form method="post">{% csrf_token %}
+                <button class="button button-small" name="ginasio" value="{{ g.pk }}">Gerir</button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>A sua conta ainda não está associada a nenhum ginásio. Contacte a equipa da plataforma.</p>
+    {% endif %}
+  </div>
+{% endblock %}

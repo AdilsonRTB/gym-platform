@@ -1,0 +1,15 @@
+{% extends "wagtailadmin/base.html" %}
+{% block titletag %}Emitir fatura{% endblock %}
+{% block content %}
+  {% include "wagtailadmin/shared/header.html" with title="Emitir fatura" subtitle=fatura.numero icon="doc-full-inverse" %}
+  <div class="nice-padding">
+    <div class="plataforma-painel">
+      <p>Nova tentativa de emissão da fatura <strong>{{ fatura.numero }}</strong> ({{ fatura.valor_cve }} CVE · {{ fatura.nome_cliente }}).</p>
+      {% if fatura.erro %}<p class="plataforma-muted">Último erro: {{ fatura.erro }}</p>{% endif %}
+      <form method="post">{% csrf_token %}
+        <button class="button">Emitir</button>
+        <a class="button button-secondary" href="{% url 'billing_fatura:index' %}">Cancelar</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}
